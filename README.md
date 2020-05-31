@@ -8,10 +8,11 @@
 
 ## Need
 
-Name | Version
-python | 3.8.1
-PyQt | 5.14.2
-Git | 2.26.2
+| Name | Version |
+| ------ | ------- |
+| python | 3.8.1 |
+| PyQt | 5.14.2 |
+| Git | 2.26.2 |
 
 ---
 
