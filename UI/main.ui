@@ -14,30 +14,14 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label">
+   <widget class="QOpenGLWidget" name="openGLWidget">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>180</y>
-      <width>40</width>
-      <height>40</height>
+      <x>0</x>
+      <y>0</y>
+      <width>801</width>
+      <height>601</height>
      </rect>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btnTest">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>400</y>
-      <width>94</width>
-      <height>36</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>testBtn</string>
     </property>
    </widget>
   </widget>

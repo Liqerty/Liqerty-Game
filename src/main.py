@@ -1,25 +1,32 @@
-from src.UI import Ui_MainWindow
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+#  =================================
+#   Name: Simple PyQt-Game
+#   Author: Liqerty team
+#   Description: RougeLike
+#  =================================
+
 from PyQt5 import QtWidgets
-from PyQt5 import QtCore
+from PyQt5 import QtGui
+from PyQt5.QtWidgets import QOpenGLWidget
 import sys
 
 
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
-        QtWidgets.QWidget.__init__(self, parent)
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
-        self.ui.btnTest.clicked.connect(self.addWidget)
+        self.g = {'x': 400, 'y': 400}
+        super().__init__()
+        self.setupUI()
 
-    def addWidget(self):
-        test = QtWidgets.QLabel(text="Test", parent=self.centralWidget())
-        test.setGeometry(QtCore.QRect(170, 280, 40, 40))
-        test.setObjectName("test")
-        print(test)
+    def setupUI(self):
+        self.setGeometry(300, 300, self.g['x'], self.g['y'])
+        self.setWindowTitle('OpenGL simple Game')
+        self.setWindowIcon(QtGui.QIcon("../assets/icon.jpg"))
+
+        self.show()
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     window = Window()
-    window.show()
     app.exec_()
