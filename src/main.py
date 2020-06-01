@@ -31,6 +31,7 @@ class Window(QtWidgets.QMainWindow):
                 self.grid[i].append(QtWidgets.QLabel(self))
                 self.grid[i][j].setGeometry(int(i*self.pixSize['x']), int(j*self.pixSize['y']),
                                             int(self.pixSize['x']), int(self.pixSize['y']))
+                self.grid[i][j].setStyleSheet("border : 1px black; border-style : solid; background-color: #ccc")
         self.show()
 
 
