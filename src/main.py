@@ -11,8 +11,8 @@ class Window(QtWidgets.QMainWindow):
     grid: list
 
     def __init__(self, parent=None):
-        self.g = {'x': 400, 'y': 400}  # Main Window Size
-        self.pixNum = {'x': 10, 'y': 10}  # Num of Pixels
+        self.g = {'x': 360, 'y': 360}  # Main Window Size
+        self.pixNum = {'x': 9, 'y': 9}  # Num of Pixels
         self.pixSize = {
             'x': self.g['x'] / self.pixNum['x'],
             'y': self.g['y'] / self.pixNum['y']
@@ -23,7 +23,8 @@ class Window(QtWidgets.QMainWindow):
 
     def setupUI(self):
         self.setGeometry(300, 300, self.g['x'], self.g['y'])
-        self.setWindowTitle('OpenGL simple Game')
+        self.setFixedSize(self.g['x'], self.g['y'])
+        self.setWindowTitle('PyQt simple Game')
         self.setWindowIcon(QtGui.QIcon("../assets/icon.jpg"))
         for i in range(self.pixNum['y']):
             self.grid.append([])
