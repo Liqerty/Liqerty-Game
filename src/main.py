@@ -1,10 +1,5 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-#  =================================
-#   Name: Simple PyQt-Game
-#   Author: Liqerty team
-#   Description: RougeLike
-#  =================================
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
@@ -13,8 +8,16 @@ import sys
 
 
 class Window(QtWidgets.QMainWindow):
+    grid: list
+
     def __init__(self, parent=None):
-        self.g = {'x': 400, 'y': 400}
+        self.g = {'x': 400, 'y': 400}  # Main Window Size
+        self.pixNum = {'x': 10, 'y': 10}  # Num of Pixels
+        self.pixSize = {
+            'x': self.g['x'] / self.pixNum['x'],
+            'y': self.g['y'] / self.pixNum['y']
+        }  # Size of pixel
+        self.grid = []
         super().__init__()
         self.setupUI()
 
@@ -22,7 +25,12 @@ class Window(QtWidgets.QMainWindow):
         self.setGeometry(300, 300, self.g['x'], self.g['y'])
         self.setWindowTitle('OpenGL simple Game')
         self.setWindowIcon(QtGui.QIcon("../assets/icon.jpg"))
-
+        for i in range(self.pixNum['y']):
+            self.grid.append([])
+            for j in range(self.pixNum['x']):
+                self.grid[i].append(QtWidgets.QLabel(self))
+                self.grid[i][j].setGeometry(int(i*self.pixSize['x']), int(j*self.pixSize['y']),
+                                            int(self.pixSize['x']), int(self.pixSize['y']))
         self.show()
 
 
