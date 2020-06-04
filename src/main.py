@@ -33,7 +33,14 @@ class Window(QtWidgets.QMainWindow):
                 self.grid[i][j].setGeometry(int(i*self.pixSize['x']), int(j*self.pixSize['y']),
                                             int(self.pixSize['x']), int(self.pixSize['y']))
                 self.grid[i][j].setStyleSheet("border : 1px black; border-style : solid; background-color: #ccc")
+        self.updateView(0, 0)
         self.show()
+
+    def updateView(self, x: int, y: int) -> None:  # Update View information
+        for i in range(self.pixNum['y']):
+            self.grid.append([])
+            for j in range(self.pixNum['x']):
+                self.grid[i][j].setPixmap(QtGui.QPixmap('../assets/icon.jpg'))
 
 
 if __name__ == "__main__":
