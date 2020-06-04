@@ -4,6 +4,7 @@
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from random import randint
+from src.RMC import RMC
 from PyQt5.QtWidgets import QOpenGLWidget
 import sys
 
@@ -22,7 +23,9 @@ class Window(QtWidgets.QMainWindow):
         }  # Size of pixel
         self.grid1 = []
         self.grid2 = []
-        self.map = []
+        self.map = RMC.createMap(9, 9, ".", "#")['grid']
+        for i in range(len(self.map)):
+            print(self.map[i])
         super().__init__()
         self.setupUI()
 
@@ -46,13 +49,6 @@ class Window(QtWidgets.QMainWindow):
                 self.grid2[i].append(QtWidgets.QLabel(self))
                 self.grid2[i][j].setGeometry(int(i*self.pixSize['x']), int(j*self.pixSize['y']),
                                             int(self.pixSize['x']), int(self.pixSize['y']))
-        for i in range(self.pixNum['x']):
-            self.map.append([])
-            for j in range(self.pixNum['y']):
-                if randint(0, 100) >= 50:
-                    self.map[i].append("#")
-                else:
-                    self.map[i].append(".")
         self.updateView(0, 0)
         self.show()
 
