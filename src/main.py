@@ -3,8 +3,9 @@
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
+from PyQt5.QtCore import Qt
 from random import randint
-from src.RMC import RMC
+from src.RMC import RMC  # Map generator
 from PyQt5.QtWidgets import QOpenGLWidget
 import sys
 
@@ -105,6 +106,16 @@ class Window(QtWidgets.QMainWindow):
                     img = QtGui.QPixmap()
                 img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
                 self.grid2[i][j].setPixmap(img)
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_W:
+            print("W")
+        if e.key() == Qt.Key_S:
+            print("S")
+        if e.key() == Qt.Key_A:
+            print("A")
+        if e.key() == Qt.Key_D:
+            print("D")
 
 
 if __name__ == "__main__":
