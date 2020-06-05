@@ -82,13 +82,13 @@ class Window(QtWidgets.QMainWindow):
                                             int(self.pixSize['x']), int(self.pixSize['y']))
         print(self.player.x)
         print(self.player.y)
-        self.updateView(self.player.x-int(len(self.grid1)/2), self.player.y-int(len(self.grid1[0])/2))
+        self.lookAtPlayer()
         self.show()
 
     def updateView(self, x: int, y: int) -> None:  # Update View information
         for i in range(self.pixNum['y']):
             for j in range(self.pixNum['x']):
-                if len(self.map) > j+y and len(self.map[j]) > i+x and j+y > 0 and i+x > 0:
+                if len(self.map) > j+y and len(self.map[j]) > i+x and j+y >= 0 and i+x >= 0:
                     if self.map[j+y][i+x] == "#":
                         img = QtGui.QPixmap('../assets/floor.png')
                     else:
@@ -109,13 +109,21 @@ class Window(QtWidgets.QMainWindow):
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_W:
-            print("W")
+            if self.map[self.player.y-1][self.player.x] == "#":
+                self.player.y -= 1
         if e.key() == Qt.Key_S:
-            print("S")
+            if self.map[self.player.y + 1][self.player.x] == "#":
+                self.player.y += 1
         if e.key() == Qt.Key_A:
-            print("A")
+            if self.map[self.player.y][self.player.x - 1] == "#":
+                self.player.x -= 1
         if e.key() == Qt.Key_D:
-            print("D")
+            if self.map[self.player.y][self.player.x + 1] == "#":
+                self.player.x += 1
+        self.lookAtPlayer()
+
+    def lookAtPlayer(self):
+        self.updateView(self.player.x - int(len(self.grid1) / 2), self.player.y - int(len(self.grid1[0]) / 2))
 
 
 if __name__ == "__main__":
