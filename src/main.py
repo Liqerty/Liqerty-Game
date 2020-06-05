@@ -10,6 +10,8 @@ import sys
 
 
 class Entity:
+    x: int
+    y: int
 
     def __init__(self):
         self.x = 0
@@ -46,9 +48,14 @@ class Window(QtWidgets.QMainWindow):
         self.grid2 = []
         self.map = RMC.createMap(9, 9, ".", "#")['grid']
         self.player = Player()
-        self.player.move(randint(0, len(self.map)), randint(0, len(self.map[0])))
         for i in range(len(self.map)):
             print(self.map[i])
+
+        self.player.moveTo(randint(0, len(self.map)-1), randint(0, len(self.map[0])-1))
+        while self.map[self.player.y] == "." or\
+                self.map[self.player.y][self.player.x] == ".":
+            self.player.moveTo(randint(0, len(self.map)-1), randint(0, len(self.map[0])-1))
+
         super().__init__()
         self.setupUI()
 
