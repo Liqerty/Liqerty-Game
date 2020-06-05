@@ -18,4 +18,8 @@
 
 ## Usage
 
-None
+```
+git clone https://github.com/Liqerty/PyQt-Game.git
+cd PyQt-Game
+python src/main.py
+```
