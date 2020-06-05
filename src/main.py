@@ -1,13 +1,22 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+import os
+import sys
+print(os.getcwd())
+if os.getcwd()[-4:] == "/src":
+    os.chdir('/'.join(os.getcwd().split("/")[:-1]))
+print(os.getcwd())
+sys.path.append('/'.join(os.getcwd().split("/")))
+print(sys.path)
+
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from random import randint
 from src.RMC import RMC  # Map generator
 from PyQt5.QtWidgets import QOpenGLWidget
-import sys
+
 
 
 class Entity:
@@ -47,7 +56,7 @@ class Window(QtWidgets.QMainWindow):
         }  # Size of pixel
         self.grid1 = []
         self.grid2 = []
-        self.map = RMC.createMap(9, 9, ".", "#")['grid']
+        self.map = RMC.createMap(120, 120, ".", "#")['grid']
         self.player = Player()
         for i in range(len(self.map)):
             print(self.map[i])
@@ -64,7 +73,7 @@ class Window(QtWidgets.QMainWindow):
         self.setGeometry(300, 300, self.g['x'], self.g['y'])
         self.setFixedSize(self.g['x'], self.g['y'])
         self.setWindowTitle('PyQt simple Game')
-        self.setWindowIcon(QtGui.QIcon("../assets/icon.jpg"))
+        self.setWindowIcon(QtGui.QIcon("assets/icon.jpg"))
         for i in range(self.pixNum['y']):
             self.grid1.append([])
             for j in range(self.pixNum['x']):
@@ -90,36 +99,46 @@ class Window(QtWidgets.QMainWindow):
             for j in range(self.pixNum['x']):
                 if len(self.map) > j+y and len(self.map[j]) > i+x and j+y >= 0 and i+x >= 0:
                     if self.map[j+y][i+x] == "#":
-                        img = QtGui.QPixmap('../assets/floor.png')
+                        img = QtGui.QPixmap('assets/floor.png')
                     else:
-                        img = QtGui.QPixmap('../assets/black.png')
+                        img = QtGui.QPixmap('assets/black.png')
                 else:
-                    img = QtGui.QPixmap('../assets/black.png')
+                    img = QtGui.QPixmap('assets/black.png')
                 img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
                 self.grid1[i][j].setPixmap(img)
         for i in range(self.pixNum['y']):
             for j in range(self.pixNum['x']):
-                #img = QtGui.QPixmap('../assets/punch3.png')
+                #img = QtGui.QPixmap('assets/punch3.png')
                 if self.player.x-x == i and self.player.y-y == j:
-                    img = QtGui.QPixmap('../assets/wel.png')
-                else:
-                    img = QtGui.QPixmap()
-                img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
-                self.grid2[i][j].setPixmap(img)
+                    img = QtGui.QPixmap('assets/wel.png')
+                    img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
+                    self.grid2[i][j].setPixmap(img)
+                #else:
+                #    img = QtGui.QPixmap("")
+                #    img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
+
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_W:
             if self.map[self.player.y-1][self.player.x] == "#":
                 self.player.y -= 1
-        if e.key() == Qt.Key_S:
+                self.tick()
+        elif e.key() == Qt.Key_S:
             if self.map[self.player.y + 1][self.player.x] == "#":
                 self.player.y += 1
-        if e.key() == Qt.Key_A:
+                self.tick()
+        elif e.key() == Qt.Key_A:
             if self.map[self.player.y][self.player.x - 1] == "#":
                 self.player.x -= 1
-        if e.key() == Qt.Key_D:
+                self.tick()
+        elif e.key() == Qt.Key_D:
             if self.map[self.player.y][self.player.x + 1] == "#":
                 self.player.x += 1
+                self.tick()
+        elif e.key() == Qt.Key_Space:
+            self.tick()
+
+    def tick(self):
         self.lookAtPlayer()
 
     def lookAtPlayer(self):
