@@ -4,12 +4,9 @@
 import os
 import sys
 
-print(os.getcwd())
 if os.getcwd()[-4:] == "/src":
     os.chdir('/'.join(os.getcwd().split("/")[:-1]))  # cross-platform
-print(os.getcwd())
 sys.path.append('/'.join(os.getcwd().split("/")))
-print(sys.path)
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
@@ -57,15 +54,17 @@ class Window(QtWidgets.QMainWindow):
         }  # Size of pixel
         self.grid1 = []
         self.grid2 = []
-        self.map = RMC.createMap(120, 120, ".", "#")['grid']
+        self.map = RMC.createMap(60, 120, ".", "#")['grid']
+        self.map = RMC.line(self.map, 0, 0, 59, 119, "#")
         self.player = Player()
         for i in range(len(self.map)):
             print(self.map[i])
 
-        self.player.moveTo(randint(0, len(self.map) - 1), randint(0, len(self.map[0]) - 1))
+        self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
         while self.map[self.player.y] == "." or \
                 self.map[self.player.y][self.player.x] == ".":
-            self.player.moveTo(randint(0, len(self.map) - 1), randint(0, len(self.map[0]) - 1))
+            self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
+        self.player.moveTo(59, 119)
 
         super().__init__()
         self.setupUI()
@@ -99,15 +98,16 @@ class Window(QtWidgets.QMainWindow):
                     if self.map[j + y][i + x] == "#":
                         img = QtGui.QPixmap('assets/floor.png')
                     else:
-                        if self.map[j+y+1][i+x] == "#" or self.map[j+y-1][i+x] == "#" or \
-                                self.map[j+y][i+x+1] == "#" or self.map[j+y][i+x-1] == "#" or \
-                                self.map[j+y+1][i+x+1] == "#" or self.map[j+y+1][i+x-1] == "#" or \
-                                self.map[j+y-1][i+x+1] == "#" or self.map[j+y-1][i+x-1] == "#":
-                            img = QtGui.QPixmap('assets/wall1.png')
-                        else:
-                            img = QtGui.QPixmap('assets/black.png')
+                        img = QtGui.QPixmap('assets/black.png')
+                        if j+y+1 < len(self.map) and j+y-1 >= 0 and\
+                                i+x+1 < len(self.map[0]) and i+x-1 >= 0:
+                            if self.map[j+y+1][i+x] == "#" or self.map[j+y-1][i+x] == "#" or \
+                                    self.map[j+y][i+x+1] == "#" or self.map[j+y][i+x-1] == "#" or \
+                                    self.map[j+y+1][i+x+1] == "#" or self.map[j+y+1][i+x-1] == "#" or \
+                                    self.map[j+y-1][i+x+1] == "#" or self.map[j+y-1][i+x-1] == "#":
+                                img = QtGui.QPixmap('assets/wall1.png')
                 else:
-                    img = QtGui.QPixmap('assets/wall1.png')
+                    img = QtGui.QPixmap('assets/black.png')
                 img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
                 self.grid1[i][j].setPixmap(img)
         for i in range(self.pixNum['y']):
@@ -123,21 +123,25 @@ class Window(QtWidgets.QMainWindow):
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_W:
-            if self.map[self.player.y - 1][self.player.x] == "#":
-                self.player.y -= 1
-                self.tick()
+            if self.player.y -1 >= 0:
+                if self.map[self.player.y - 1][self.player.x] == "#":
+                    self.player.y -= 1
+                    self.tick()
         elif e.key() == Qt.Key_S:
-            if self.map[self.player.y + 1][self.player.x] == "#":
-                self.player.y += 1
-                self.tick()
+            if self.player.y + 1 < len(self.map):
+                if self.map[self.player.y + 1][self.player.x] == "#":
+                    self.player.y += 1
+                    self.tick()
         elif e.key() == Qt.Key_A:
-            if self.map[self.player.y][self.player.x - 1] == "#":
-                self.player.x -= 1
-                self.tick()
+            if self.player.x - 1 >= 0:
+                if self.map[self.player.y][self.player.x - 1] == "#":
+                    self.player.x -= 1
+                    self.tick()
         elif e.key() == Qt.Key_D:
-            if self.map[self.player.y][self.player.x + 1] == "#":
-                self.player.x += 1
-                self.tick()
+            if self.player.x + 1 < len(self.map[self.player.y]):
+                if self.map[self.player.y][self.player.x + 1] == "#":
+                    self.player.x += 1
+                    self.tick()
         elif e.key() == Qt.Key_Space:
             self.tick()
 
