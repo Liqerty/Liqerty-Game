@@ -9,10 +9,31 @@ from PyQt5.QtWidgets import QOpenGLWidget
 import sys
 
 
+class Entity:
+
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+
+    def move(self, x: int, y: int):
+        self.x += x
+        self.y += y
+
+    def moveTo(self, x: int, y: int):
+        self.x = x
+        self.y = y
+
+class Player(Entity):
+
+    def __init__(self):
+        super().__init__()
+
+
 class Window(QtWidgets.QMainWindow):
     grid1: list
     grid2: list
     map: list
+    player: Player
 
     def __init__(self, parent=None):
         self.g = {'x': 360, 'y': 360}  # Main Window Size
@@ -24,6 +45,8 @@ class Window(QtWidgets.QMainWindow):
         self.grid1 = []
         self.grid2 = []
         self.map = RMC.createMap(9, 9, ".", "#")['grid']
+        self.player = Player()
+        self.player.move(randint(0, len(self.map)), randint(0, len(self.map[0])))
         for i in range(len(self.map)):
             print(self.map[i])
         super().__init__()
@@ -49,14 +72,19 @@ class Window(QtWidgets.QMainWindow):
                 self.grid2[i].append(QtWidgets.QLabel(self))
                 self.grid2[i][j].setGeometry(int(i*self.pixSize['x']), int(j*self.pixSize['y']),
                                             int(self.pixSize['x']), int(self.pixSize['y']))
-        self.updateView(0, 0)
+        print(self.player.x)
+        print(self.player.y)
+        self.updateView(self.player.x-int(len(self.grid1)/2), self.player.y-int(len(self.grid1[0])/2))
         self.show()
 
     def updateView(self, x: int, y: int) -> None:  # Update View information
         for i in range(self.pixNum['y']):
             for j in range(self.pixNum['x']):
-                if self.map[j][i] == "#":
-                    img = QtGui.QPixmap('../assets/floor.png')
+                if len(self.map) > j+y and len(self.map[j]) > i+x and j+y > 0 and i+x > 0:
+                    if self.map[j+y][i+x] == "#":
+                        img = QtGui.QPixmap('../assets/floor.png')
+                    else:
+                        img = QtGui.QPixmap('../assets/black.png')
                 else:
                     img = QtGui.QPixmap('../assets/black.png')
                 img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
@@ -64,7 +92,10 @@ class Window(QtWidgets.QMainWindow):
         for i in range(self.pixNum['y']):
             for j in range(self.pixNum['x']):
                 #img = QtGui.QPixmap('../assets/punch3.png')
-                img = QtGui.QPixmap()
+                if self.player.x-x == i and self.player.y-y == j:
+                    img = QtGui.QPixmap('../assets/wel.png')
+                else:
+                    img = QtGui.QPixmap()
                 img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
                 self.grid2[i][j].setPixmap(img)
 
