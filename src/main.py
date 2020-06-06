@@ -44,13 +44,11 @@ class Entity:
     x: int
     y: int
     live: int
-    img: QtGui.QPixmap
 
-    def __init__(self, img=QtGui.QPixmap()):
+    def __init__(self):
         self.x = 0
         self.y = 0
         self.live = 1
-        self.img = img
 
     def move(self, x: int, y: int):
         self.x += x
@@ -61,7 +59,11 @@ class Entity:
         self.y = y
 
     def tick(self):
-        print(str(self.x)+" "+str(self.x)+" - default ent tick")
+        print(str(self.x)+" YES")
+
+class Enemy(Entity):
+    def __init__(self):
+        super(Enemy, self).__init__()
 
 class Player(Entity):
 
@@ -71,17 +73,6 @@ class Player(Entity):
 
     def tick(self):
         pass
-
-class Enemy(Entity):
-    player: Player
-
-    def __init__(self, player):
-        super(Enemy, self).__init__()
-        self.player = player
-
-    def tick(self):
-        if 1 >= self.player.x - self.x >= -1:
-            print("YES")
 
 
 class Window(QtWidgets.QMainWindow):
