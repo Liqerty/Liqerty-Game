@@ -19,10 +19,12 @@ from PyQt5.QtWidgets import QOpenGLWidget
 class Entity:
     x: int
     y: int
+    live: int
 
     def __init__(self):
         self.x = 0
         self.y = 0
+        self.live = 1
 
     def move(self, x: int, y: int):
         self.x += x
@@ -32,11 +34,46 @@ class Entity:
         self.x = x
         self.y = y
 
+    def tick(self):
+        print(str(self.x)+" YES")
+
+class Server:
+    ents: list
+
+    def __init__(self):
+        self.ents = []
+
+    def addEnt(self, ent: Entity):
+        try:
+            self.ents.append(ent)
+        except:
+            print("I don't know why, but I can't add ent to list D:")
+
+    def tick(self):
+        for i in range(len(self.ents)):
+            try:
+                self.ents[i].tick()
+            except:
+                print("ent["+str(i)+"] can't tick")
+
+    def removeEnt(self, ind):
+        try:
+            self.ents.pop(ind)
+        except:
+            print("can't remove ent")
+
+class Enemy(Entity):
+    def __init__(self):
+        super(Enemy, self).__init__()
 
 class Player(Entity):
 
     def __init__(self):
-        super().__init__()
+        super(Player, self).__init__()
+        self.live = 6
+
+    def tick(self):
+        pass
 
 
 class Window(QtWidgets.QMainWindow):
@@ -55,7 +92,6 @@ class Window(QtWidgets.QMainWindow):
         self.grid1 = []
         self.grid2 = []
         self.map = RMC.createMap(60, 120, ".", "#")['grid']
-        self.map = RMC.line(self.map, 0, 0, 59, 119, "#")
         self.player = Player()
         for i in range(len(self.map)):
             print(self.map[i])
@@ -64,7 +100,6 @@ class Window(QtWidgets.QMainWindow):
         while self.map[self.player.y] == "." or \
                 self.map[self.player.y][self.player.x] == ".":
             self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
-        self.player.moveTo(59, 119)
 
         super().__init__()
         self.setupUI()
@@ -74,18 +109,34 @@ class Window(QtWidgets.QMainWindow):
         self.setFixedSize(self.g['x'], self.g['y'])
         self.setWindowTitle('PyQt simple Game')
         self.setWindowIcon(QtGui.QIcon("assets/icon.jpg"))
+
         for i in range(self.pixNum['y']):
             self.grid1.append([])
             for j in range(self.pixNum['x']):
                 self.grid1[i].append(QtWidgets.QLabel(self))
                 self.grid1[i][j].setGeometry(int(i * self.pixSize['x']), int(j * self.pixSize['y']),
                                              int(self.pixSize['x']), int(self.pixSize['y']))
+
+        # =============== UI ===============
+        self.label = QtWidgets.QLabel(self)
+        try:
+            img = QtGui.QPixmap("assets/life"+str(self.player.live)+".png")
+            img = img.scaled(124, 16)
+        except:
+            img = QtGui.QPixmap("assets/life0.png")
+            img = img.scaled(124, 16)
+            print("Lives out of range")
+        self.label.setPixmap(img)
+        self.label.setGeometry(5, 10, 124, 16)
+        # ==================================
+
         for i in range(self.pixNum['y']):
             self.grid2.append([])
             for j in range(self.pixNum['x']):
                 self.grid2[i].append(QtWidgets.QLabel(self))
                 self.grid2[i][j].setGeometry(int(i * self.pixSize['x']), int(j * self.pixSize['y']),
                                              int(self.pixSize['x']), int(self.pixSize['y']))
+
         print(self.player.x)
         print(self.player.y)
         self.lookAtPlayer()
@@ -112,14 +163,20 @@ class Window(QtWidgets.QMainWindow):
                 self.grid1[i][j].setPixmap(img)
         for i in range(self.pixNum['y']):
             for j in range(self.pixNum['x']):
-                # img = QtGui.QPixmap('assets/punch3.png')
                 if self.player.x - x == i and self.player.y - y == j:
                     img = QtGui.QPixmap('assets/wel.png')
                     img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
                     self.grid2[i][j].setPixmap(img)
-                # else:
-                #    img = QtGui.QPixmap("")
-                #    img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
+
+        # =============== UI ===============
+        try:
+            img = QtGui.QPixmap("assets/life" + str(self.player.live) + ".png")
+            img = img.scaled(124, 16)
+        except:
+            pass
+        self.label.setPixmap(img)
+        self.label.setGeometry(5, 10, 124, 16)
+        # ==================================
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_W:
