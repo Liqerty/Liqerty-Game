@@ -19,6 +19,14 @@ from PyQt5.QtWidgets import QOpenGLWidget
 class Entity:
     x: int
     y: int
+<<<<<<< HEAD
+    live: int
+
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.live = 1
+=======
     life: int
     img: QtGui.QPixmap
 
@@ -30,6 +38,7 @@ class Entity:
         self.life = 1
         self.img = img
         self.parent = parent
+>>>>>>> refs/remotes/origin/master
 
     def move(self, x: int, y: int):
         self.x += x
@@ -40,8 +49,16 @@ class Entity:
         self.y = y
 
     def tick(self):
+<<<<<<< HEAD
+        print(str(self.x)+" YES")
+
+class Enemy(Entity):
+    def __init__(self):
+        super(Enemy, self).__init__()
+=======
         print(str(self.x) + " " + str(self.x) + " - default ent tick")
 
+>>>>>>> refs/remotes/origin/master
 
 class Player(Entity):
     halfLife: int
@@ -64,6 +81,8 @@ class Player(Entity):
             self.parent.newLevel()
 
 
+<<<<<<< HEAD
+=======
 class Enemy(Entity):
     player: Player
     grid: list
@@ -117,6 +136,7 @@ class Server:
         except:
             print("can't remove ent")
 
+<<<<<<< HEAD
 class Exit(Entity):
     player: Player
 
@@ -128,6 +148,9 @@ class Exit(Entity):
         if self.x == self.player.x and self.y == self.player.y:
             self.parent.newLevel()
 
+=======
+>>>>>>> refs/remotes/origin/master
+>>>>>>> dc18cef171d2e818b629702de27b0bc6c5ab25ce
 
 class Window(QtWidgets.QMainWindow):
     grid1: list
