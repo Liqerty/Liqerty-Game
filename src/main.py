@@ -15,28 +15,6 @@ from random import randint
 from src.RMC import RMC  # Map generator
 from PyQt5.QtWidgets import QOpenGLWidget
 
-
-class Entity:
-    x: int
-    y: int
-    live: int
-
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.live = 1
-
-    def move(self, x: int, y: int):
-        self.x += x
-        self.y += y
-
-    def moveTo(self, x: int, y: int):
-        self.x = x
-        self.y = y
-
-    def tick(self):
-        print(str(self.x)+" YES")
-
 class Server:
     ents: list
 
@@ -61,6 +39,27 @@ class Server:
             self.ents.pop(ind)
         except:
             print("can't remove ent")
+
+class Entity:
+    x: int
+    y: int
+    live: int
+
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.live = 1
+
+    def move(self, x: int, y: int):
+        self.x += x
+        self.y += y
+
+    def moveTo(self, x: int, y: int):
+        self.x = x
+        self.y = y
+
+    def tick(self):
+        print(str(self.x)+" YES")
 
 class Enemy(Entity):
     def __init__(self):
@@ -91,15 +90,8 @@ class Window(QtWidgets.QMainWindow):
         }  # Size of pixel
         self.grid1 = []
         self.grid2 = []
-        self.map = RMC.createMap(60, 120, ".", "#")['grid']
-        self.player = Player()
-        for i in range(len(self.map)):
-            print(self.map[i])
 
-        self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
-        while self.map[self.player.y] == "." or \
-                self.map[self.player.y][self.player.x] == ".":
-            self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
+        self.newLevel()
 
         super().__init__()
         self.setupUI()
@@ -141,6 +133,21 @@ class Window(QtWidgets.QMainWindow):
         print(self.player.y)
         self.lookAtPlayer()
         self.show()
+
+    def newLevel(self):
+        self.map = RMC.createMap(60, 120, ".", "#")['grid']
+
+        self.server = Server()
+        for i in range(10):
+            self.server.addEnt(Enemy())
+        self.player = Player()
+        for i in range(len(self.map)):
+            print(self.map[i])
+
+        self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
+        while self.map[self.player.y] == "." or \
+                self.map[self.player.y][self.player.x] == ".":
+            self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
 
     def updateView(self, x: int, y: int) -> None:  # Update View information
         for i in range(self.pixNum['y']):
@@ -203,6 +210,7 @@ class Window(QtWidgets.QMainWindow):
             self.tick()
 
     def tick(self):
+        self.server.tick()
         self.lookAtPlayer()
 
     def lookAtPlayer(self):
