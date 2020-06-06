@@ -117,6 +117,17 @@ class Server:
         except:
             print("can't remove ent")
 
+class Exit(Entity):
+    player: Player
+
+    def __init__(self, player, img=None, parent=None):
+        super(Exit, self).__init__(img=img, parent=parent)
+        self.player = player
+
+    def tick(self):
+        if self.x == self.player.x and self.y == self.player.y:
+            self.parent.newLevel()
+
 
 class Window(QtWidgets.QMainWindow):
     grid1: list
@@ -195,12 +206,13 @@ class Window(QtWidgets.QMainWindow):
         self.player = Player(QtGui.QPixmap("assets/wel.png").scaled(int(self.pixSize['x']), \
                                                                     int(self.pixSize['y'])), \
                              self)
-        self.exit = Entity()
+        self.exit = Exit(self.player, parent=self, img=QtGui.QPixmap("../assets/"))
         self.server = Server()
         for i in range(len(self.map)):
             print(self.map[i])
         for i in range(self.num_of_rooms * 10):
             self.server.addEnt(Enemy(self.player, self.map))
+        self.server.addEnt(self.exit)
         print(self.num_of_rooms)
         self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
         while self.map[self.player.y][self.player.x] == ".":
