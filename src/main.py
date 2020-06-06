@@ -15,19 +15,21 @@ from random import randint
 from src.RMC import RMC  # Map generator
 from PyQt5.QtWidgets import QOpenGLWidget
 
+
 class Entity:
     x: int
     y: int
     life: int
     img: QtGui.QPixmap
 
-    def __init__(self, img=None):
+    def __init__(self, img=None, parent=None):
         if img == None:
             img = QtGui.QPixmap()
         self.x = 0
         self.y = 0
         self.life = 1
         self.img = img
+        self.parent = parent
 
     def move(self, x: int, y: int):
         self.x += x
@@ -38,48 +40,56 @@ class Entity:
         self.y = y
 
     def tick(self):
-        print(str(self.x)+" "+str(self.x)+" - default ent tick")
+        print(str(self.x) + " " + str(self.x) + " - default ent tick")
+
 
 class Player(Entity):
     halfLife: int
     fullLife: int
     maxLife: int
 
-    def __init__(self):
-        super(Player, self).__init__()
+    def __init__(self, img=None, parent=None):
+        super(Player, self).__init__(img=img, parent=parent)
         self.life = 6
         self.maxLife = 6
         self.halfLife = 0
         self.fullLife = 15
 
-    def tick(self):   # TODO: Add death
+    def tick(self):
         if self.halfLife >= self.fullLife:
             self.halfLife = 0
             if self.life < self.maxLife:
                 self.life += 1
+        if self.life <= 0:
+            self.parent.newLevel()
+
 
 class Enemy(Entity):
     player: Player
     grid: list
 
-    def __init__(self, player, grid):
+    def __init__(self, player, grid, parent=None, id=None):
         img = QtGui.QPixmap("assets/enemyld.png")
-        super(Enemy, self).__init__(img=img)
+        super(Enemy, self).__init__(img=img, parent=parent)
         self.player = player
         self.grid = grid
+        self.id = id
 
         self.moveTo(randint(0, len(self.grid[0]) - 1), randint(0, len(self.grid) - 1))
-        while self.grid[self.y][self.x] == "." and (
-                self.player.x != self.x or self.player.y != self.y):
+        while self.grid[self.y][self.x] == "." and self.player.x != self.x and self.player.y != self.y:
             self.moveTo(randint(0, len(self.grid[0]) - 1), randint(0, len(self.grid) - 1))
 
     def tick(self):
         if self.x - self.player.x in [-1, 0, 1]:
             if self.y - self.player.y == 0:
                 self.player.life -= 1
+                self.player.tick()
         if self.y - self.player.y in [-1, 0, 1]:
             if self.x - self.player.x == 0:
                 self.player.life -= 1
+                self.player.tick()
+        if self.life <= 0:
+            self.parent.delEnt()
 
 
 class Server:
@@ -99,7 +109,7 @@ class Server:
             try:
                 self.ents[i].tick()
             except:
-                print("ent["+str(i)+"] can't tick")
+                print("ent[" + str(i) + "] can't tick")
 
     def removeEnt(self, ind):
         try:
@@ -126,7 +136,7 @@ class Window(QtWidgets.QMainWindow):
         }  # Size of pixel
         self.grid1 = []
         self.grid2 = []
-        
+
         self.newLevel()
 
         super().__init__()
@@ -145,10 +155,17 @@ class Window(QtWidgets.QMainWindow):
                 self.grid1[i][j].setGeometry(int(i * self.pixSize['x']), int(j * self.pixSize['y']),
                                              int(self.pixSize['x']), int(self.pixSize['y']))
 
+        for i in range(self.pixNum['y']):
+            self.grid2.append([])
+            for j in range(self.pixNum['x']):
+                self.grid2[i].append(QtWidgets.QLabel(self))
+                self.grid2[i][j].setGeometry(int(i * self.pixSize['x']), int(j * self.pixSize['y']),
+                                             int(self.pixSize['x']), int(self.pixSize['y']))
+
         # =============== UI ===============
         self.label = QtWidgets.QLabel(self)
         try:
-            img = QtGui.QPixmap("assets/life"+str(self.player.life)+".png")
+            img = QtGui.QPixmap("assets/life" + str(self.player.life) + ".png")
             img = img.scaled(124, 16)
         except:
             img = QtGui.QPixmap("assets/life0.png")
@@ -158,38 +175,40 @@ class Window(QtWidgets.QMainWindow):
         self.label.setGeometry(5, 10, 124, 16)
         # ==================================
 
-        for i in range(self.pixNum['y']):
-            self.grid2.append([])
-            for j in range(self.pixNum['x']):
-                self.grid2[i].append(QtWidgets.QLabel(self))
-                self.grid2[i][j].setGeometry(int(i * self.pixSize['x']), int(j * self.pixSize['y']),
-                                             int(self.pixSize['x']), int(self.pixSize['y']))
-
         print(self.player.x)
         print(self.player.y)
         self.lookAtPlayer()
         self.show()
 
     def newLevel(self):
+        try:
+            del self.player
+            del self.exit
+            del self.server
+            del self.map
+            del self.num_of_rooms
+        except:
+            pass
         mp = RMC.createMap(60, 120, ".", "#")
         self.map = mp['grid']
         self.num_of_rooms = mp['num_of_rooms']
-        self.player = Player()
+        self.player = Player(QtGui.QPixmap("assets/wel.png").scaled(int(self.pixSize['x']), \
+                                                                    int(self.pixSize['y'])), \
+                             self)
         self.exit = Entity()
         self.server = Server()
         for i in range(len(self.map)):
             print(self.map[i])
-        for i in range(self.num_of_rooms*10):
+        for i in range(self.num_of_rooms * 10):
             self.server.addEnt(Enemy(self.player, self.map))
         print(self.num_of_rooms)
         self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
         while self.map[self.player.y][self.player.x] == ".":
             self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
 
-
-
         self.exit.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
-        while self.map[self.exit.y][self.exit.x] == "." and (self.player.x != self.exit.x or self.player.y != self.exit.y):
+        while self.map[self.exit.y][self.exit.x] == "." and (
+                self.player.x != self.exit.x or self.player.y != self.exit.y):
             self.exit.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
 
     def updateView(self, x: int, y: int) -> None:  # Update View information
@@ -200,12 +219,12 @@ class Window(QtWidgets.QMainWindow):
                         img = QtGui.QPixmap('assets/floor.png')
                     else:
                         img = QtGui.QPixmap('assets/black.png')
-                        if j+y+1 < len(self.map) and j+y-1 >= 0 and\
-                                i+x+1 < len(self.map[0]) and i+x-1 >= 0:
-                            if self.map[j+y+1][i+x] == "#" or self.map[j+y-1][i+x] == "#" or \
-                                    self.map[j+y][i+x+1] == "#" or self.map[j+y][i+x-1] == "#" or \
-                                    self.map[j+y+1][i+x+1] == "#" or self.map[j+y+1][i+x-1] == "#" or \
-                                    self.map[j+y-1][i+x+1] == "#" or self.map[j+y-1][i+x-1] == "#":
+                        if j + y + 1 < len(self.map) and j + y - 1 >= 0 and \
+                                i + x + 1 < len(self.map[0]) and i + x - 1 >= 0:
+                            if self.map[j + y + 1][i + x] == "#" or self.map[j + y - 1][i + x] == "#" or \
+                                    self.map[j + y][i + x + 1] == "#" or self.map[j + y][i + x - 1] == "#" or \
+                                    self.map[j + y + 1][i + x + 1] == "#" or self.map[j + y + 1][i + x - 1] == "#" or \
+                                    self.map[j + y - 1][i + x + 1] == "#" or self.map[j + y - 1][i + x - 1] == "#":
                                 img = QtGui.QPixmap('assets/wall1.png')
                 else:
                     img = QtGui.QPixmap('assets/black.png')
@@ -222,8 +241,7 @@ class Window(QtWidgets.QMainWindow):
                         img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
                         self.grid2[i][j].setPixmap(img)
                 if self.player.x - x == i and self.player.y - y == j:
-                    img = QtGui.QPixmap('assets/wel.png')
-                    img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
+                    img = self.player.img
                     self.grid2[i][j].setPixmap(img)
 
         # =============== UI ===============
@@ -239,7 +257,7 @@ class Window(QtWidgets.QMainWindow):
     def keyPressEvent(self, e):
         Vec = [0, 0]
         if e.key() == Qt.Key_W:
-            if self.player.y -1 >= 0:
+            if self.player.y - 1 >= 0:
                 if self.map[self.player.y - 1][self.player.x] == "#":
                     Vec[1] = -1
         elif e.key() == Qt.Key_S:
