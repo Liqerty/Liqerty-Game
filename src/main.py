@@ -91,6 +91,8 @@ class Window(QtWidgets.QMainWindow):
         self.grid1 = []
         self.grid2 = []
 
+        self.exit = Entity()
+        
         self.newLevel()
 
         super().__init__()
@@ -145,9 +147,14 @@ class Window(QtWidgets.QMainWindow):
             print(self.map[i])
 
         self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
-        while self.map[self.player.y] == "." or \
-                self.map[self.player.y][self.player.x] == ".":
+        while self.map[self.player.y][self.player.x] == ".":
             self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
+
+
+
+        self.exit.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
+        while self.map[self.exit.y][self.exit.x] == "." and (self.player.x != self.exit.x or self.player.y != self.exit.y):
+            self.exit.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
 
     def updateView(self, x: int, y: int) -> None:  # Update View information
         for i in range(self.pixNum['y']):
