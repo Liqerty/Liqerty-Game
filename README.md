@@ -1,8 +1,10 @@
 # Main
 
- * Name: PyQt Game
- * Author: Liqery Team
- * Version: -0.0.1
+ * Name: Liqerty
+ * Author: Liqerty Team
+ * Version: 1.0.0
+
+Simple PyQt5 game
 
 ---
 
