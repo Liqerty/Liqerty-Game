@@ -19,14 +19,6 @@ from PyQt5.QtWidgets import QOpenGLWidget
 class Entity:
     x: int
     y: int
-<<<<<<< HEAD
-    live: int
-
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.live = 1
-=======
     life: int
     img: QtGui.QPixmap
 
@@ -38,7 +30,6 @@ class Entity:
         self.life = 1
         self.img = img
         self.parent = parent
->>>>>>> refs/remotes/origin/master
 
     def move(self, x: int, y: int):
         self.x += x
@@ -49,16 +40,8 @@ class Entity:
         self.y = y
 
     def tick(self):
-<<<<<<< HEAD
-        print(str(self.x)+" YES")
-
-class Enemy(Entity):
-    def __init__(self):
-        super(Enemy, self).__init__()
-=======
         print(str(self.x) + " " + str(self.x) + " - default ent tick")
 
->>>>>>> refs/remotes/origin/master
 
 class Player(Entity):
     halfLife: int
@@ -81,8 +64,6 @@ class Player(Entity):
             self.parent.newLevel()
 
 
-<<<<<<< HEAD
-=======
 class Enemy(Entity):
     player: Player
     grid: list
@@ -136,21 +117,6 @@ class Server:
         except:
             print("can't remove ent")
 
-<<<<<<< HEAD
-class Exit(Entity):
-    player: Player
-
-    def __init__(self, player, img=None, parent=None):
-        super(Exit, self).__init__(img=img, parent=parent)
-        self.player = player
-
-    def tick(self):
-        if self.x == self.player.x and self.y == self.player.y:
-            self.parent.newLevel()
-
-=======
->>>>>>> refs/remotes/origin/master
->>>>>>> dc18cef171d2e818b629702de27b0bc6c5ab25ce
 
 class Window(QtWidgets.QMainWindow):
     grid1: list
@@ -229,13 +195,12 @@ class Window(QtWidgets.QMainWindow):
         self.player = Player(QtGui.QPixmap("assets/wel.png").scaled(int(self.pixSize['x']), \
                                                                     int(self.pixSize['y'])), \
                              self)
-        self.exit = Exit(self.player, parent=self, img=QtGui.QPixmap("../assets/"))
+        self.exit = Entity()
         self.server = Server()
         for i in range(len(self.map)):
             print(self.map[i])
         for i in range(self.num_of_rooms * 10):
             self.server.addEnt(Enemy(self.player, self.map))
-        self.server.addEnt(self.exit)
         print(self.num_of_rooms)
         self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
         while self.map[self.player.y][self.player.x] == ".":
