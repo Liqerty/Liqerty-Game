@@ -2,7 +2,7 @@
 
  * Name: Liqerty
  * Author: Liqerty Team
- * Version: 1.0.1
+ * Version: 1.1.0
 
 Simple PyQt5 game
 
