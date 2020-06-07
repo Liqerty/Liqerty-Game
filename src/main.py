@@ -118,6 +118,10 @@ class Enemy(ServerEnt):
             if self.x - self.player.x == 0:
                 self.player.life -= 1
                 self.player.tick()
+        if randint(0, 100) > 90:
+            tx = randint(self.grid[self.y][self.x-1] == "#", self.grid[self.y][self.x+1] == "#")
+            ty = randint(self.grid[self.y-1][tx] == "#", self.grid[self.y+1][tx] == "#")
+            self.move(tx, ty)
         if self.life <= 0:
             self.delMe()
 
