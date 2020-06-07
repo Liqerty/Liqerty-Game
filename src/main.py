@@ -106,7 +106,7 @@ class Enemy(ServerEnt):
         self.grid = grid
 
         self.moveTo(randint(0, len(self.grid[0]) - 1), randint(0, len(self.grid) - 1))
-        while self.grid[self.y][self.x] == "." or (self.player.x == self.x and self.player.y == self.y):
+        while self.grid[self.y][self.x][0] == "." or (self.player.x == self.x and self.player.y == self.y):
             self.moveTo(randint(0, len(self.grid[0]) - 1), randint(0, len(self.grid) - 1))
 
     def tick(self):
@@ -118,9 +118,9 @@ class Enemy(ServerEnt):
             if self.x - self.player.x == 0:
                 self.player.life -= 1
                 self.player.tick()
-        if randint(0, 100) > 90:
-            tx = randint(self.grid[self.y][self.x-1] == "#", self.grid[self.y][self.x+1] == "#")
-            ty = randint(self.grid[self.y-1][tx] == "#", self.grid[self.y+1][tx] == "#")
+        if randint(0, 100) > 50:
+            tx = randint(int(self.grid[self.y][self.x-1][0] == "#")*-1, self.grid[self.y][self.x+1][0] == "#")
+            ty = randint(int(self.grid[self.y-1][self.x+tx][0] == "#")*-1, self.grid[self.y+1][self.x+tx][0] == "#")
             self.move(tx, ty)
         if self.life <= 0:
             self.delMe()
@@ -246,6 +246,12 @@ class Window(QtWidgets.QMainWindow):
         mp = RMC.createMap(60, 120, ".", "#")
         self.map = mp['grid']
         self.num_of_rooms = mp['num_of_rooms']
+        for i in range(len(self.map)):
+            for j in range(len(self.map[i])):
+                if self.map[i][j][0] == "#":
+                    self.map[i][j] = "#"+str(randint(1, 5))
+                elif self.map[i][j][0] == ".":
+                    self.map[i][j] = "." + str(randint(1, 3))
         self.player = Player(QtGui.QPixmap("assets/wel.png").scaled(int(self.pixSize['x']), \
                                                                     int(self.pixSize['y'])), \
                              parent=self)
@@ -253,14 +259,14 @@ class Window(QtWidgets.QMainWindow):
         self.exit = Exit(self.player, img=QtGui.QPixmap("assets/lestnicha.png"), parent=self)
         self.server = Server()
         self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
-        while self.map[self.player.y][self.player.x] == ".":
+        while self.map[self.player.y][self.player.x][0] == ".":
             self.player.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
         for i in range(self.num_of_rooms * 10):
             self.server.addEnt(Enemy(self.player, self.map, parent=self))
         self.server.addEnt(self.exit)
 
         self.exit.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
-        while self.map[self.exit.y][self.exit.x] == "." and (
+        while self.map[self.exit.y][self.exit.x][0] == "." and (
                 self.player.x != self.exit.x or self.player.y != self.exit.y):
             self.exit.moveTo(randint(0, len(self.map[0]) - 1), randint(0, len(self.map) - 1))
 
@@ -276,17 +282,17 @@ class Window(QtWidgets.QMainWindow):
         for i in range(self.pixNum['y']):
             for j in range(self.pixNum['x']):
                 if len(self.map) > j + y and len(self.map[j]) > i + x and j + y >= 0 and i + x >= 0:
-                    if self.map[j + y][i + x] == "#":
-                        img = QtGui.QPixmap('assets/floor.png')
+                    if self.map[j + y][i + x][0] == "#":
+                        img = QtGui.QPixmap('assets/floor'+self.map[y+j][x+i][1]+'.png')
                     else:
                         img = QtGui.QPixmap('assets/black.png')
                         if j + y + 1 < len(self.map) and j + y - 1 >= 0 and \
                                 i + x + 1 < len(self.map[0]) and i + x - 1 >= 0:
-                            if self.map[j + y + 1][i + x] == "#" or self.map[j + y - 1][i + x] == "#" or \
-                                    self.map[j + y][i + x + 1] == "#" or self.map[j + y][i + x - 1] == "#" or \
-                                    self.map[j + y + 1][i + x + 1] == "#" or self.map[j + y + 1][i + x - 1] == "#" or \
-                                    self.map[j + y - 1][i + x + 1] == "#" or self.map[j + y - 1][i + x - 1] == "#":
-                                img = QtGui.QPixmap('assets/wall1.png')
+                            if self.map[j + y + 1][i + x][0] == "#" or self.map[j + y - 1][i + x][0] == "#" or \
+                                    self.map[j + y][i + x + 1][0] == "#" or self.map[j + y][i + x - 1][0] == "#" or \
+                                    self.map[j + y + 1][i + x + 1][0] == "#" or self.map[j + y + 1][i + x - 1][0] == "#" or \
+                                    self.map[j + y - 1][i + x + 1][0] == "#" or self.map[j + y - 1][i + x - 1][0] == "#":
+                                img = QtGui.QPixmap('assets/wall'+self.map[y+j][x+i][1]+'.png')
                 else:
                     img = QtGui.QPixmap('assets/black.png')
                 img = img.scaled(int(self.pixSize['x']), int(self.pixSize['y']))
@@ -329,19 +335,19 @@ class Window(QtWidgets.QMainWindow):
         Vec = [0, 0]
         if e.key() == Qt.Key_W:
             if self.player.y - 1 >= 0:
-                if self.map[self.player.y - 1][self.player.x] == "#":
+                if self.map[self.player.y - 1][self.player.x][0] == "#":
                     Vec[1] = -1
         elif e.key() == Qt.Key_S:
             if self.player.y + 1 < len(self.map):
-                if self.map[self.player.y + 1][self.player.x] == "#":
+                if self.map[self.player.y + 1][self.player.x][0] == "#":
                     Vec[1] = 1
         elif e.key() == Qt.Key_A:
             if self.player.x - 1 >= 0:
-                if self.map[self.player.y][self.player.x - 1] == "#":
+                if self.map[self.player.y][self.player.x - 1][0] == "#":
                     Vec[0] = -1
         elif e.key() == Qt.Key_D:
             if self.player.x + 1 < len(self.map[self.player.y]):
-                if self.map[self.player.y][self.player.x + 1] == "#":
+                if self.map[self.player.y][self.player.x + 1][0] == "#":
                     Vec[0] = 1
         elif e.key() == Qt.Key_Space:
             self.player.stamina += 3
@@ -420,7 +426,7 @@ class Window(QtWidgets.QMainWindow):
 
     def start(self):
         if self.started:
-            print("WTF?!")
+            print("Can't start while started")
             return
         self.mainMenuLabel.hide()
         self.mainMenuBtn.hide()
