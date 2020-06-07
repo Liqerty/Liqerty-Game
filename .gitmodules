@@ -1,0 +1,3 @@
+[submodule "src/RMC"]
+	path = src/RMC
+	url = https://github.com/Liqerty/RMC.git
